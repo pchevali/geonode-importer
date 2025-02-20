@@ -343,6 +343,7 @@ class BaseRasterFileHandler(BaseHandler):
                 workspace=workspace,
                 subtype="raster",
                 alternate=f"{workspace}:{alternate}",
+                store=alternate,
                 dirty_state=True,
                 title=layer_name,
                 owner=_exec.user,

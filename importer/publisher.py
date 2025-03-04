@@ -173,7 +173,7 @@ class DataPublisher:
                 filter(
                     None,
                     (
-                        self.cat.get_resource(x, stores=[self.store],workspace=self.workspace)
+                        self.cat.get_resource(x, store=self.store,workspace=self.workspace)
                         for x in possible_layer_name
                     ),
                 )

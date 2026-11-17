@@ -169,16 +169,26 @@ class DataPublisher:
                 _resource.get("name").split(":")[-1],
                 f"{self.workspace.name}:{_resource.get('name')}",
             ]
-            res = list(
+            # Raster stores are created by the publish itself, so self.store is
+            # still None here. Without a store, get_resource walks every store of
+            # the workspace (one REST call per store), which takes minutes once
+            # the catalog holds thousands of coverage stores. Raster stores are
+            # named after the resource, so look the store up by name instead.
+            store = self.store or self.cat.get_store(
+                name=_resource.get("name").split(":")[-1], workspace=self.workspace
+            )
+            # stop at the first name that matches
+            res = next(
                 filter(
                     None,
                     (
-                        self.cat.get_resource(x, store=self.store,workspace=self.workspace)
+                        self.cat.get_resource(x, store=store, workspace=self.workspace)
                         for x in possible_layer_name
                     ),
-                )
+                ),
+                None,
             )
-            if not res or (res and not res[0].projection):
+            if not res or not res.projection:
                 raise PublishResourceException(
                     f"The SRID for the resource {_resource} is not correctly set, Please check Geoserver logs"
                 )
